@@ -96,7 +96,7 @@ if data is not None:
     
 
     # Display the title
-    st.title("🧗‍♂️chalkopus🐙")
+    st.title("🧗‍♂️chalktopus🐙")
 
 
     # Separate completed and tried data into tables
