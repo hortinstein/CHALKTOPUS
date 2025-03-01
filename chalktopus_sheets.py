@@ -1,0 +1,162 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import calplot
+import streamlit as st
+
+
+st.set_page_config('🧗‍♂️chalkopus🐙',initial_sidebar_state="collapsed",layout="wide")
+
+# Define grade weightings
+weightings = {"v0": 1, "v1": 2, "v2": 4, "v3": 8, "v4": 12}
+
+# Function to load data from public Google Sheets
+def load_data_from_public_sheets():
+    st.sidebar.header("Google Sheets Connection")
+    
+    # Allow user to enter sheet URL or ID
+    sheet_url = "https://docs.google.com/spreadsheets/d/15r0qE2WNQYk2CLqxnI7b5r9_OWyaOMFAtb_4t8_ylnA/edit?usp=sharing"
+
+    # Extract sheet ID from URL if necessary
+    if "spreadsheets/d/" in sheet_url:
+        sheet_id = sheet_url.split("spreadsheets/d/")[1].split("/")[0]
+    else:
+        sheet_id = sheet_url
+    
+    # Construct the export URL (CSV format)
+    export_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
+    
+    # Read the CSV directly from the URL
+    data = pd.read_csv(export_url)
+    
+    st.sidebar.success("Connected to Google Sheets successfully!")
+    return data
+    
+# Load the data
+data = load_data_from_public_sheets()
+
+if data is not None:
+    # Helper function to parse a value
+    def parse_value(value):
+        if pd.isna(value):
+            return 0, 0
+        
+        # If it's a string, check for the format pattern
+        if isinstance(value, str):
+            parts = value.split()
+            
+            # Format: "1 tried 3 other" or similar variations
+            if len(parts) >= 3 and "tried" in parts:
+                # Find position of "tried" in the parts
+                tried_index = parts.index("tried")
+                
+                # Get completed count (number before "tried")
+                completed = int(parts[tried_index-1]) if tried_index > 0 and parts[tried_index-1].isdigit() else 0
+                
+                # Get tried count (number after "tried")
+                tried = int(parts[tried_index+1]) if tried_index+1 < len(parts) and parts[tried_index+1].isdigit() else 0
+                
+                return completed, tried
+            
+            # Just "tried X" format
+            elif "tried" in parts:
+                # Find all numbers in the string
+                numbers = [int(s) for s in parts if s.isdigit()]
+                if numbers:
+                    return 0, numbers[0]
+            
+            # Try to parse as a plain number if it contains only digits
+            elif value.isdigit():
+                return int(value), 0
+                
+            return 0, 0
+        
+        # If it's a number
+        try:
+            return int(value), 0
+        except (ValueError, TypeError):
+            return 0, 0
+
+    # Add new columns for completed and tried counts
+    for col in ["vb", "v0", "v1", "v2", "v3", "v4"]:
+        if col in data.columns:
+            data[f"{col}_completed"] = None
+            data[f"{col}_tried"] = None
+
+    # Process each row and column
+    for index, row in data.iterrows():
+        for col in ["vb", "v0", "v1", "v2", "v3", "v4"]:
+            if col in data.columns:
+                value = row[col]
+                completed, tried = parse_value(value)
+                if completed is not None:
+                    data.loc[index, f"{col}_completed"] = completed
+                if tried is not None:
+                    data.loc[index, f"{col}_tried"] = tried
+
+    
+
+    # Display the title
+    st.title("🧗‍♂️chalkopus🐙")
+
+
+    # Separate completed and tried data into tables
+    completed_columns = [col for col in data.columns if "_completed" in col]
+    tried_columns = [col for col in data.columns if "_tried" in col]
+
+    completed_table = data[["Location", "Dates"] + completed_columns]
+    tried_table = data[["Location", "Dates"] + tried_columns]
+    tab1,tab2 = st.tabs(["Graphs","Data"])
+    
+    with tab2:
+        # Show tables in Streamlit
+        st.subheader("Completed Climbs")
+        st.dataframe(completed_table)
+
+        st.subheader("Tried Climbs")
+        st.dataframe(tried_table)
+
+        # Calculate the daily score
+        def calculate_score(row):
+            score = 0
+            for col in weightings.keys():
+                if f"{col}_completed" in row:
+                    if pd.notna(row[f"{col}_completed"]):
+                        score += row[f"{col}_completed"] * weightings[col]
+            return score
+
+        data["Daily_Score"] = data.apply(calculate_score, axis=1)
+
+        
+
+    # Convert 'Dates' to datetime format
+    data["Dates"] = pd.to_datetime(data["Dates"])
+
+    # Sort by date
+    data = data.sort_values("Dates")
+    with tab1: 
+        # Plot calendar heatmap using calplot
+        try:
+            st.subheader("Calendar Heatmap")
+            fig, ax = calplot.calplot(data.set_index("Dates")["Daily_Score"], cmap="coolwarm", colorbar=True)
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error creating calendar plot: {e}")
+
+        # Plot line graph of daily scores
+        try:
+            st.subheader("Score Trend")
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.plot(data["Dates"], data["Daily_Score"], marker="o", linestyle="-")
+            ax.set_xlabel("Date")
+            ax.set_ylabel("Daily Score")
+            ax.set_title("Daily Climbing Scores Over Time")
+            ax.grid(True)
+            plt.xticks(rotation=45)
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error creating line plot: {e}")
+        # Display daily scores
+        st.subheader("Daily Scores")
+        st.dataframe(data[["Location", "Dates", "Daily_Score"]])
+else:
+    st.error("No data available. Please provide a valid public Google Sheet URL.")
