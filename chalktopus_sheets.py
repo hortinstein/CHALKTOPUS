@@ -105,7 +105,7 @@ if data is not None:
 
     completed_table = data[["Location", "Dates"] + completed_columns]
     tried_table = data[["Location", "Dates"] + tried_columns]
-    tab1,tab2 = st.tabs(["Graphs","Data"])
+    tab1,tab2,tab3 = st.tabs(["Graphs","Data","Smoothed Score Trend"])
     
     with tab2:
         # Show tables in Streamlit
@@ -158,5 +158,21 @@ if data is not None:
         # Display daily scores
         st.subheader("Daily Scores")
         st.dataframe(data[["Location", "Dates", "Daily_Score"]])
+    
+    with tab3:
+        # Implement a smoothing function using a rolling average
+        try:
+            st.subheader("Smoothed Score Trend")
+            data["Smoothed_Score"] = data["Daily_Score"].rolling(window=7, min_periods=1).mean()
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.plot(data["Dates"], data["Smoothed_Score"], marker="o", linestyle="-")
+            ax.set_xlabel("Date")
+            ax.set_ylabel("Smoothed Score")
+            ax.set_title("Smoothed Climbing Scores Over Time")
+            ax.grid(True)
+            plt.xticks(rotation=45)
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error creating smoothed score plot: {e}")
 else:
     st.error("No data available. Please provide a valid public Google Sheet URL.")
