@@ -105,7 +105,7 @@ if data is not None:
 
     completed_table = data[["Location", "Dates"] + completed_columns]
     tried_table = data[["Location", "Dates"] + tried_columns]
-    tab1,tab2,tab3 = st.tabs(["Graphs","Data","Smoothed Score Trend"])
+    tab1,tab2,tab3,tab4 = st.tabs(["Graphs","Data","Smoothed Score Trend", "Macro Data"])
     
     with tab2:
         # Show tables in Streamlit
@@ -174,5 +174,49 @@ if data is not None:
             st.pyplot(fig)
         except Exception as e:
             st.error(f"Error creating smoothed score plot: {e}")
+    
+    with tab4:
+        st.subheader("Macro Data")
+        
+        # Calculate total climbs for each grade
+        total_climbs = data[completed_columns].sum()
+        st.subheader("Total Climbs")
+        st.dataframe(total_climbs)
+        
+        # Plot total climbs for each grade
+        try:
+            st.subheader("Total Climbs Graph")
+            fig, ax = plt.subplots(figsize=(12, 6))
+            total_climbs.plot(kind='bar', ax=ax)
+            ax.set_xlabel("Grade")
+            ax.set_ylabel("Total Climbs")
+            ax.set_title("Total Climbs for Each Grade")
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error creating total climbs graph: {e}")
+        
+        # Calculate average climbs per week for each grade
+        data['Week'] = data['Dates'].dt.isocalendar().week
+        weekly_climbs = data.groupby('Week')[completed_columns].sum()
+        average_climbs_per_week = weekly_climbs.mean()
+        st.subheader("Average Climbs per Week")
+        st.dataframe(average_climbs_per_week)
+        
+        # Plot average climbs per week for each grade
+        try:
+            st.subheader("Average Climbs per Week Graph")
+            fig, ax = plt.subplots(figsize=(12, 6))
+            average_climbs_per_week.plot(kind='bar', ax=ax)
+            ax.set_xlabel("Grade")
+            ax.set_ylabel("Average Climbs per Week")
+            ax.set_title("Average Climbs per Week for Each Grade")
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error creating average climbs per week graph: {e}")
+        
+        # Calculate total climbing sessions
+        total_sessions = data['Dates'].nunique()
+        st.subheader("Total Climbing Sessions")
+        st.write(f"Total Climbing Sessions: {total_sessions}")
 else:
     st.error("No data available. Please provide a valid public Google Sheet URL.")
