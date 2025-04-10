@@ -40,5 +40,12 @@
     "latitude": 55.921099,
     "longitude": -3.398545,
     "website": "https://www.edinburghleisure.co.uk/venues/edinburgh-international-climbing-arena"
+  },
+  "MOVEMENT, FL": {
+    "name": "Movement Gym - Florida",
+    "address": "1234 Climbing St, Miami, FL 33101",
+    "latitude": 25.7617,
+    "longitude": -80.1918,
+    "website": "https://movementgyms.com/florida/"
   }
 }

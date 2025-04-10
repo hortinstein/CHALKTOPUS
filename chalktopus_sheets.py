@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import calplot
 import streamlit as st
+import folium
+import json
 
 
 st.set_page_config('🧗‍♂️chalktopus🐙',initial_sidebar_state="collapsed",layout="wide")
@@ -105,7 +107,7 @@ if data is not None:
 
     completed_table = data[["Location", "Dates"] + completed_columns]
     tried_table = data[["Location", "Dates"] + tried_columns]
-    tab1,tab2,tab3,tab4 = st.tabs(["Graphs","Data","Smoothed Score Trend", "Macro Data"])
+    tab1,tab2,tab3,tab4,tab5 = st.tabs(["Graphs","Data","Smoothed Score Trend", "Macro Data", "Map"])
     
     with tab2:
         # Show tables in Streamlit
@@ -218,5 +220,26 @@ if data is not None:
         total_sessions = data['Dates'].nunique()
         st.subheader("Total Climbing Sessions")
         st.write(f"Total Climbing Sessions: {total_sessions}")
+
+    with tab5:
+        st.subheader("Map")
+        
+        def load_locations():
+            with open('locations.json') as f:
+                return json.load(f)
+        
+        def create_map(locations):
+            m = folium.Map(location=[20,0], zoom_start=2)
+            for loc in locations.values():
+                folium.Marker(
+                    location=[loc['latitude'], loc['longitude']],
+                    popup=f"<b>{loc['name']}</b><br>{loc['address']}<br><a href='{loc['website']}' target='_blank'>Website</a>",
+                    tooltip=loc['name']
+                ).add_to(m)
+            return m
+        
+        locations = load_locations()
+        map_ = create_map(locations)
+        st_data = st_folium(map_, width=700, height=500)
 else:
     st.error("No data available. Please provide a valid public Google Sheet URL.")
