@@ -1,26 +1,44 @@
 {
   "VERTICALVENTURES": {
+    "name": "Vertical Ventures",
+    "address": "116 18th St S, St. Petersburg, FL 33712",
     "latitude": 27.765365,
-    "longitude": -82.657885
+    "longitude": -82.657885,
+    "website": "https://verticalventures.com"
   },
   "CENTRAL ROCK": {
+    "name": "Central Rock Gym - Tampa",
+    "address": "4479 W Gandy Blvd B, Tampa, FL 33611",
     "latitude": 27.892611,
-    "longitude": -82.523081
+    "longitude": -82.523081,
+    "website": "https://centralrockgym.com/tampa/"
   },
   "MOVEMENT, VA": {
+    "name": "Movement Crystal City",
+    "address": "1235 S Clark St, Arlington, VA 22202",
     "latitude": 38.863556,
-    "longitude": -77.051458
+    "longitude": -77.051458,
+    "website": "https://movementgyms.com/crystal-city/"
   },
   "MOVEMENT, MD": {
+    "name": "Movement Columbia",
+    "address": "7125 Columbia Gateway Dr, Columbia, MD 21046",
     "latitude": 39.175427,
-    "longitude": -76.800816
+    "longitude": -76.800816,
+    "website": "https://movementgyms.com/columbia/"
   },
   "MOVEMENT , MD": {
+    "name": "Movement Columbia",
+    "address": "7125 Columbia Gateway Dr, Columbia, MD 21046",
     "latitude": 39.175427,
-    "longitude": -76.800816
+    "longitude": -76.800816,
+    "website": "https://movementgyms.com/columbia/"
   },
   "Edinburgh International Climbing Arena": {
+    "name": "Edinburgh International Climbing Arena (EICA)",
+    "address": "South Platt Hill, Ratho, Newbridge EH28 8AA, Scotland",
     "latitude": 55.921099,
-    "longitude": -3.398545
+    "longitude": -3.398545,
+    "website": "https://www.edinburghleisure.co.uk/venues/edinburgh-international-climbing-arena"
   }
 }
