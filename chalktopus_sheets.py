@@ -235,7 +235,8 @@ if data is not None:
                 folium.Marker(
                     location=[loc['latitude'], loc['longitude']],
                     popup=f"<b>{loc['name']}</b><br>{loc['address']}<br><a href='{loc['website']}' target='_blank'>Website</a>",
-                    tooltip=loc['name']
+                    tooltip=loc['name'],
+                    icon=folium.DivIcon(html=f"<div style='font-size: 24px;'>🧗</div>")
                 ).add_to(m)
             return m
         
