@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import calplot
 import streamlit as st
+from streamlit_folium import st_folium
 import folium
 import json
 
