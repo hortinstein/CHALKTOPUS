@@ -5,7 +5,7 @@ import streamlit as st
 from streamlit_folium import st_folium
 import folium
 import json
-
+import seaborn as sns  # P64e5
 
 st.set_page_config('🧗‍♂️chalktopus🐙',initial_sidebar_state="collapsed",layout="wide")
 
@@ -108,7 +108,7 @@ if data is not None:
 
     completed_table = data[["Location", "Dates"] + completed_columns]
     tried_table = data[["Location", "Dates"] + tried_columns]
-    tab1,tab2,tab3,tab4,tab5 = st.tabs(["Graphs","Data","Smoothed Score Trend", "Macro Data", "Map"])
+    tab1,tab2,tab3,tab4,tab5,tab6 = st.tabs(["Graphs","Data","Smoothed Score Trend", "Macro Data", "Map", "Difficulty Graphs"])  # P3afd
     
     with tab2:
         # Show tables in Streamlit
@@ -243,5 +243,30 @@ if data is not None:
         locations = load_locations()
         map_ = create_map(locations)
         st_data = st_folium(map_, width=700, height=500)
+
+    with tab6:  # P3afd
+        st.subheader("Difficulty Graphs")
+        
+        # Function to plot bar graphs for each difficulty level (P4315)
+        def plot_difficulty_graphs(data, show_tried):
+            difficulties = ["vb", "v0", "v1", "v2", "v3", "v4"]
+            for difficulty in difficulties:
+                fig, ax = plt.subplots(figsize=(10, 5))
+                sns.barplot(x=data["Dates"], y=data[f"{difficulty}_completed"], ax=ax, label="Completed")
+                if show_tried:
+                    sns.barplot(x=data["Dates"], y=data[f"{difficulty}_tried"], ax=ax, label="Tried", color="orange")
+                ax.set_title(f"Climbs for {difficulty.upper()}")
+                ax.set_xlabel("Date")
+                ax.set_ylabel("Count")
+                ax.legend()
+                plt.xticks(rotation=45)
+                st.pyplot(fig)
+        
+        # Checkbox to toggle the display of the "tried" line (P3ba8)
+        show_tried = st.checkbox("Show Tried Climbs")
+        
+        # Plot the difficulty graphs
+        plot_difficulty_graphs(data, show_tried)
+
 else:
     st.error("No data available. Please provide a valid public Google Sheet URL.")
