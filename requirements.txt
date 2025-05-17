@@ -3,3 +3,4 @@ calplot
 pandas
 folium
 streamlit_folium
+seaborn
