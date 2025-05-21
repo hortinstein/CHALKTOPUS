@@ -161,6 +161,24 @@ if data is not None:
         # Display daily scores
         st.subheader("Daily Scores")
         st.dataframe(data[["Location", "Dates", "Daily_Score"]])
+        
+        # Calculate the number of times you went per week
+        data['Week'] = data['Dates'].dt.isocalendar().week
+        weekly_visits = data.groupby('Week').size()
+
+        # Plot bar graph of weekly visits
+        try:
+            st.subheader("Weekly Visits")
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.bar(weekly_visits.index, weekly_visits.values)
+            ax.set_xlabel("Week")
+            ax.set_ylabel("Number of Visits")
+            ax.set_title("Number of Visits per Week")
+            ax.grid(True)
+            plt.xticks(rotation=45)
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error creating weekly visits plot: {e}")
     
     with tab3:
         # Implement a smoothing function using a rolling average
