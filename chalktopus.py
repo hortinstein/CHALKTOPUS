@@ -73,7 +73,7 @@ import matplotlib.pyplot as plt
 
 
 # Convert 'Dates' to datetime format
-data["Dates"] = pd.to_datetime(data["Dates"])
+data["Dates"] = pd.to_datetime(data["Dates"], errors="coerce")
 
 # Sort by date
 data = data.sort_values("Dates")
