@@ -40,5 +40,12 @@
     "latitude": 55.921099,
     "longitude": -3.398545,
     "website": "https://www.edinburghleisure.co.uk/venues/edinburgh-international-climbing-arena"
+  },
+  "UPLIFT": {
+    "name": "Uplift Climbing",
+    "address": "17229 15th Ave NE, Shoreline, WA 98155",
+    "latitude": 47.8107,
+    "longitude": -122.3773,
+    "website": "https://www.upliftclimbing.com"
   }
 }
