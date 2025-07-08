@@ -271,7 +271,7 @@ if data is not None:
         
         locations = load_locations()
         map_ = create_map(locations)
-        st_data = st_folium(map_, width=700, height=500)
+        st_data = st_folium(map_, width=700, height=500, key="climbing_locations_map")
 
     with tab6:  # P3afd
         st.subheader("Difficulty Graphs")
