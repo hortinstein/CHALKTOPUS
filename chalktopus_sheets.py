@@ -28,11 +28,22 @@ def load_data_from_public_sheets():
     # Construct the export URL (CSV format)
     export_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
     
-    # Read the CSV directly from the URL
-    data = pd.read_csv(export_url)
-    
-    st.sidebar.success("Connected to Google Sheets successfully!")
-    return data
+    try:
+        # Read the CSV directly from the URL
+        data = pd.read_csv(export_url)
+        st.sidebar.success("Connected to Google Sheets successfully!")
+        return data
+    except Exception as e:
+        st.sidebar.warning(f"Failed to connect to Google Sheets: {e}")
+        st.sidebar.info("Using local CSV data instead...")
+        # Fallback to local CSV file
+        try:
+            data = pd.read_csv("20250212_rockclimbing.csv")
+            st.sidebar.success("Loaded local CSV data successfully!")
+            return data
+        except Exception as local_e:
+            st.sidebar.error(f"Failed to load local data: {local_e}")
+            return None
     
 # Load the data
 data = load_data_from_public_sheets()
