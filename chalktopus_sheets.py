@@ -5,9 +5,9 @@ import streamlit as st
 from streamlit_folium import st_folium
 import folium
 import json
-import seaborn as sns  # P64e5
+import seaborn as sns
 
-st.set_page_config('🧗‍♂️chalktopus🐙',initial_sidebar_state="collapsed")
+st.set_page_config('🧗‍♂️chalktopus🐙', initial_sidebar_state="collapsed")
 
 # Define grade weightings
 weightings = {"v0": 1, "v1": 2, "v2": 4, "v3": 8, "v4": 12}
@@ -131,7 +131,7 @@ if data is not None:
 
     completed_table = data[["Location", "Dates"] + completed_columns]
     tried_table = data[["Location", "Dates"] + tried_columns]
-    tab1,tab2,tab3,tab4,tab5,tab6 = st.tabs(["Graphs","Data","Smoothed Score Trend", "Macro Data", "Map", "Difficulty Graphs"])  # P3afd
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Graphs", "Data", "Smoothed Score Trend", "Macro Data", "Map", "Difficulty Graphs"])
     
     with tab2:
         # Show tables in Streamlit
@@ -170,13 +170,12 @@ if data is not None:
             display_title = "Daily Climbing Scores"
             display_ylabel = "Daily Score"
 
-        
-
     # Convert 'Dates' to datetime format
-    data["Dates"] = pd.to_datetime(data["Dates"],errors="coerce")
+    data["Dates"] = pd.to_datetime(data["Dates"], errors="coerce")
 
     # Sort by date
     data = data.sort_values("Dates")
+    
     with tab1: 
         # Plot calendar heatmap using calplot
         try:
@@ -199,13 +198,6 @@ if data is not None:
             st.pyplot(fig)
         except Exception as e:
             st.error(f"Error creating line plot: {e}")
-        # Display daily scores
-        st.subheader(display_title)
-        if show_completed_counts and selected_grade:
-            display_columns = ["Location", "Dates", f"{selected_grade}_completed"]
-            st.dataframe(data[display_columns])
-        else:
-            st.dataframe(data[["Location", "Dates", "Daily_Score"]])
         
 
     
@@ -387,10 +379,10 @@ if data is not None:
             st.error(f"Error creating map: {e}")
             st.info("Please check that all required packages are installed: folium, streamlit-folium")
 
-    with tab6:  # P3afd
+    with tab6:
         st.subheader("Difficulty Graphs")
         
-        # Function to plot bar graphs for each difficulty level (P4315)
+        # Function to plot bar graphs for each difficulty level
         def plot_difficulty_graphs(data, show_tried):
             difficulties = ["vb", "v0", "v1", "v2", "v3", "v4"]
             for difficulty in difficulties:
@@ -405,7 +397,7 @@ if data is not None:
                 plt.xticks(rotation=45)
                 st.pyplot(fig)
         
-        # Checkbox to toggle the display of the "tried" line (P3ba8)
+        # Checkbox to toggle the display of the "tried" line
         show_tried = st.checkbox("Show Tried Climbs")
         
         # Plot the difficulty graphs
