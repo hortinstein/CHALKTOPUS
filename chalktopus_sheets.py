@@ -177,11 +177,11 @@ if data is not None:
         data['Week'] = data['Dates'].dt.isocalendar().week
         weekly_visits = data.groupby('Week').size()
 
-        # Plot bar graph of weekly visits
+        # Plot line graph of weekly visits
         try:
             st.subheader("Weekly Visits")
             fig, ax = plt.subplots(figsize=(12, 6))
-            ax.bar(weekly_visits.index, weekly_visits.values)
+            ax.plot(weekly_visits.index, weekly_visits.values, marker="o", linestyle="-", linewidth=2, markersize=6)
             ax.set_xlabel("Week")
             ax.set_ylabel("Number of Visits")
             ax.set_title("Number of Visits per Week")
@@ -255,8 +255,12 @@ if data is not None:
         st.subheader("Map")
         
         def load_locations():
-            with open('locations.json') as f:
-                return json.load(f)
+            try:
+                with open('locations.json') as f:
+                    return json.load(f)
+            except Exception as e:
+                st.error(f"Error loading locations.json: {e}")
+                return {}
         
         def create_map(locations):
             m = folium.Map(location=[20,0], zoom_start=2)
@@ -269,9 +273,30 @@ if data is not None:
                 ).add_to(m)
             return m
         
-        locations = load_locations()
-        map_ = create_map(locations)
-        st_data = st_folium(map_, width=700, height=500, key="climbing_locations_map")
+        # Load locations and create map
+        try:
+            locations = load_locations()
+            if locations:
+                map_ = create_map(locations)
+                # Use a unique key each time to prevent caching issues
+                map_data = st_folium(
+                    map_, 
+                    width=700, 
+                    height=500, 
+                    key=None,  # Let streamlit auto-generate key
+                    returned_objects=["last_object_clicked"]
+                )
+                
+                # Display clicked location info
+                if map_data['last_object_clicked'] is not None:
+                    clicked_data = map_data['last_object_clicked']
+                    if clicked_data and 'tooltip' in clicked_data:
+                        st.success(f"Selected location: {clicked_data['tooltip']}")
+            else:
+                st.error("No locations found to display on map.")
+        except Exception as e:
+            st.error(f"Error creating map: {e}")
+            st.info("Please check that all required packages are installed: folium, streamlit-folium")
 
     with tab6:  # P3afd
         st.subheader("Difficulty Graphs")
