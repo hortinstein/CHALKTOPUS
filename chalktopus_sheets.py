@@ -207,26 +207,7 @@ if data is not None:
         else:
             st.dataframe(data[["Location", "Dates", "Daily_Score"]])
         
-        # Calculate the number of times you went per week
-        # Use pd.Grouper to properly group by week, accounting for different years
-        data_for_weekly = data.set_index('Dates')
-        weekly_visits = data_for_weekly.groupby(pd.Grouper(freq='W')).size()
-        # Filter out weeks with zero visits and reset index for plotting
-        weekly_visits = weekly_visits[weekly_visits > 0]
 
-        # Plot line graph of weekly visits
-        try:
-            st.subheader("Weekly Visits")
-            fig, ax = plt.subplots(figsize=(12, 6))
-            ax.plot(weekly_visits.index, weekly_visits.values, marker="o", linestyle="-", linewidth=2, markersize=6)
-            ax.set_xlabel("Week Starting")
-            ax.set_ylabel("Number of Visits")
-            ax.set_title("Number of Visits per Week")
-            ax.grid(True)
-            plt.xticks(rotation=45)
-            st.pyplot(fig)
-        except Exception as e:
-            st.error(f"Error creating weekly visits plot: {e}")
     
     with tab3:
         # Implement a smoothing function using a rolling average
@@ -297,6 +278,67 @@ if data is not None:
         total_sessions = data['Dates'].nunique()
         st.subheader("Total Climbing Sessions")
         st.write(f"Total Climbing Sessions: {total_sessions}")
+        
+        # Weekly visits with zero values shown
+        st.subheader("Weekly Visits")
+        
+        # Calculate the number of times you went per week
+        # Use pd.Grouper to properly group by week, accounting for different years
+        data_for_weekly = data.set_index('Dates')
+        weekly_visits = data_for_weekly.groupby(pd.Grouper(freq='W')).size()
+        
+        # Create a complete date range to show weeks with zero visits
+        if not weekly_visits.empty:
+            # Get the date range from first visit to last visit
+            min_date = data['Dates'].min()
+            max_date = data['Dates'].max()
+            
+            # Create weekly date range
+            complete_weeks = pd.date_range(start=min_date, end=max_date, freq='W')
+            
+            # Reindex to include all weeks, filling missing with 0
+            weekly_visits = weekly_visits.reindex(complete_weeks, fill_value=0)
+            
+            # Create readable labels for weeks (start - end format)
+            week_labels = []
+            for week_end in weekly_visits.index:
+                week_start = week_end - pd.Timedelta(days=6)
+                # Format: "7-11 Jul 2025" style
+                if week_start.month == week_end.month:
+                    # Same month
+                    label = f"{week_start.day}-{week_end.day} {week_end.strftime('%b %Y')}"
+                else:
+                    # Different months
+                    label = f"{week_start.strftime('%d %b')}-{week_end.strftime('%d %b %Y')}"
+                week_labels.append(label)
+            
+            # Display weekly visits data
+            weekly_data = pd.DataFrame({
+                'Week': week_labels,
+                'Visits': weekly_visits.values
+            })
+            st.dataframe(weekly_data)
+            
+            # Plot line graph of weekly visits
+            try:
+                fig, ax = plt.subplots(figsize=(12, 6))
+                ax.plot(weekly_visits.index, weekly_visits.values, marker="o", linestyle="-", linewidth=2, markersize=6)
+                ax.set_xlabel("Week Ending")
+                ax.set_ylabel("Number of Visits")
+                ax.set_title("Number of Visits per Week (Including Weeks with 0 Visits)")
+                ax.grid(True)
+                plt.xticks(rotation=45)
+                
+                # Add text annotations for weeks with visits
+                for i, (date, visits) in enumerate(zip(weekly_visits.index, weekly_visits.values)):
+                    if visits > 0:
+                        ax.annotate(f'{visits}', (date, visits), textcoords="offset points", xytext=(0,10), ha='center')
+                
+                st.pyplot(fig)
+            except Exception as e:
+                st.error(f"Error creating weekly visits plot: {e}")
+        else:
+            st.info("No data available for weekly visits.")
 
     with tab5:
         st.subheader("Map")
