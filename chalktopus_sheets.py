@@ -112,6 +112,18 @@ if data is not None:
     # Display the title
     st.title("🧗‍♂️chalktopus🐙")
 
+    # Add sidebar controls for grade filtering
+    st.sidebar.header("Display Options")
+    
+    # Toggle between score view and completed count view
+    show_completed_counts = st.sidebar.checkbox("Show Completed Counts Instead of Scores", value=False)
+    
+    # Grade selector (only show when in completed count mode)
+    selected_grade = None
+    if show_completed_counts:
+        grade_options = ["vb", "v0", "v1", "v2", "v3", "v4"]
+        selected_grade = st.sidebar.selectbox("Select Grade to Display", grade_options, index=1)
+
 
     # Separate completed and tried data into tables
     completed_columns = [col for col in data.columns if "_completed" in col]
@@ -140,6 +152,24 @@ if data is not None:
 
         data["Daily_Score"] = data.apply(calculate_score, axis=1)
 
+        # Create display value based on toggle
+        if show_completed_counts and selected_grade:
+            # Use completed count for selected grade
+            grade_col = f"{selected_grade}_completed"
+            if grade_col in data.columns:
+                data["Display_Value"] = data[grade_col].fillna(0)
+                display_title = f"Daily {selected_grade.upper()} Completed"
+                display_ylabel = f"{selected_grade.upper()} Completed"
+            else:
+                data["Display_Value"] = data["Daily_Score"]
+                display_title = "Daily Climbing Scores"
+                display_ylabel = "Daily Score"
+        else:
+            # Use daily score
+            data["Display_Value"] = data["Daily_Score"]
+            display_title = "Daily Climbing Scores"
+            display_ylabel = "Daily Score"
+
         
 
     # Convert 'Dates' to datetime format
@@ -151,27 +181,31 @@ if data is not None:
         # Plot calendar heatmap using calplot
         try:
             st.subheader("Calendar Heatmap")
-            fig, ax = calplot.calplot(data.set_index("Dates")["Daily_Score"], cmap="coolwarm", colorbar=True)
+            fig, ax = calplot.calplot(data.set_index("Dates")["Display_Value"], cmap="coolwarm", colorbar=True)
             st.pyplot(fig)
         except Exception as e:
             st.error(f"Error creating calendar plot: {e}")
 
         # Plot line graph of daily scores
         try:
-            st.subheader("Score Trend")
+            st.subheader(display_title + " Trend")
             fig, ax = plt.subplots(figsize=(12, 6))
-            ax.plot(data["Dates"], data["Daily_Score"], marker="o", linestyle="-")
+            ax.plot(data["Dates"], data["Display_Value"], marker="o", linestyle="-")
             ax.set_xlabel("Date")
-            ax.set_ylabel("Daily Score")
-            ax.set_title("Daily Climbing Scores Over Time")
+            ax.set_ylabel(display_ylabel)
+            ax.set_title(display_title + " Over Time")
             ax.grid(True)
             plt.xticks(rotation=45)
             st.pyplot(fig)
         except Exception as e:
             st.error(f"Error creating line plot: {e}")
         # Display daily scores
-        st.subheader("Daily Scores")
-        st.dataframe(data[["Location", "Dates", "Daily_Score"]])
+        st.subheader(display_title)
+        if show_completed_counts and selected_grade:
+            display_columns = ["Location", "Dates", f"{selected_grade}_completed"]
+            st.dataframe(data[display_columns])
+        else:
+            st.dataframe(data[["Location", "Dates", "Daily_Score"]])
         
         # Calculate the number of times you went per week
         data['Week'] = data['Dates'].dt.isocalendar().week
@@ -194,18 +228,25 @@ if data is not None:
     with tab3:
         # Implement a smoothing function using a rolling average
         try:
-            st.subheader("Smoothed Score Trend")
-            data["Smoothed_Score"] = data["Daily_Score"].rolling(window=7, min_periods=1).mean()
+            if show_completed_counts and selected_grade:
+                smoothed_title = f"Smoothed {selected_grade.upper()} Completed Trend"
+                smoothed_ylabel = f"Smoothed {selected_grade.upper()} Completed"
+            else:
+                smoothed_title = "Smoothed Score Trend"
+                smoothed_ylabel = "Smoothed Score"
+                
+            st.subheader(smoothed_title)
+            data["Smoothed_Value"] = data["Display_Value"].rolling(window=7, min_periods=1).mean()
             fig, ax = plt.subplots(figsize=(12, 6))
-            ax.plot(data["Dates"], data["Smoothed_Score"], marker="o", linestyle="-")
+            ax.plot(data["Dates"], data["Smoothed_Value"], marker="o", linestyle="-")
             ax.set_xlabel("Date")
-            ax.set_ylabel("Smoothed Score")
-            ax.set_title("Smoothed Climbing Scores Over Time")
+            ax.set_ylabel(smoothed_ylabel)
+            ax.set_title(smoothed_title + " Over Time")
             ax.grid(True)
             plt.xticks(rotation=45)
             st.pyplot(fig)
         except Exception as e:
-            st.error(f"Error creating smoothed score plot: {e}")
+            st.error(f"Error creating smoothed trend plot: {e}")
     
     with tab4:
         st.subheader("Macro Data")
