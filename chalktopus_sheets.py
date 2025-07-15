@@ -208,15 +208,18 @@ if data is not None:
             st.dataframe(data[["Location", "Dates", "Daily_Score"]])
         
         # Calculate the number of times you went per week
-        data['Week'] = data['Dates'].dt.isocalendar().week
-        weekly_visits = data.groupby('Week').size()
+        # Use pd.Grouper to properly group by week, accounting for different years
+        data_for_weekly = data.set_index('Dates')
+        weekly_visits = data_for_weekly.groupby(pd.Grouper(freq='W')).size()
+        # Filter out weeks with zero visits and reset index for plotting
+        weekly_visits = weekly_visits[weekly_visits > 0]
 
         # Plot line graph of weekly visits
         try:
             st.subheader("Weekly Visits")
             fig, ax = plt.subplots(figsize=(12, 6))
             ax.plot(weekly_visits.index, weekly_visits.values, marker="o", linestyle="-", linewidth=2, markersize=6)
-            ax.set_xlabel("Week")
+            ax.set_xlabel("Week Starting")
             ax.set_ylabel("Number of Visits")
             ax.set_title("Number of Visits per Week")
             ax.grid(True)
@@ -269,8 +272,11 @@ if data is not None:
             st.error(f"Error creating total climbs graph: {e}")
         
         # Calculate average climbs per week for each grade
-        data['Week'] = data['Dates'].dt.isocalendar().week
-        weekly_climbs = data.groupby('Week')[completed_columns].sum()
+        # Use pd.Grouper to properly group by week, accounting for different years
+        data_for_weekly_climbs = data.set_index('Dates')
+        weekly_climbs = data_for_weekly_climbs.groupby(pd.Grouper(freq='W'))[completed_columns].sum()
+        # Only include weeks with at least one climb
+        weekly_climbs = weekly_climbs[weekly_climbs.sum(axis=1) > 0]
         average_climbs_per_week = weekly_climbs.mean()
         st.subheader("Average Climbs per Week")
         st.dataframe(average_climbs_per_week)
