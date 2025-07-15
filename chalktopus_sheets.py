@@ -7,7 +7,7 @@ import folium
 import json
 import seaborn as sns  # P64e5
 
-st.set_page_config('🧗‍♂️chalktopus🐙',initial_sidebar_state="collapsed",layout="wide")
+st.set_page_config('🧗‍♂️chalktopus🐙',initial_sidebar_state="collapsed")
 
 # Define grade weightings
 weightings = {"v0": 1, "v1": 2, "v2": 4, "v3": 8, "v4": 12}
