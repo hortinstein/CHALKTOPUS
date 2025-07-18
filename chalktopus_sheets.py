@@ -271,66 +271,78 @@ if data is not None:
         st.subheader("Total Climbing Sessions")
         st.write(f"Total Climbing Sessions: {total_sessions}")
         
-        # Weekly visits with zero values shown
-        st.subheader("Weekly Visits")
+        # Monthly visits with zero values shown
+        st.subheader("Monthly Visits")
         
-        # Calculate the number of times you went per week
-        # Use pd.Grouper to properly group by week, accounting for different years
-        data_for_weekly = data.set_index('Dates')
-        weekly_visits = data_for_weekly.groupby(pd.Grouper(freq='W')).size()
+        # Add checkbox to toggle between monthly totals and weekly averages
+        show_weekly_average = st.checkbox("Show Average Times per Week (Divide by 4)")
         
-        # Create a complete date range to show weeks with zero visits
-        if not weekly_visits.empty:
+        # Calculate the number of times you went per month
+        # Use pd.Grouper to properly group by month, accounting for different years
+        data_for_monthly = data.set_index('Dates')
+        monthly_visits = data_for_monthly.groupby(pd.Grouper(freq='M')).size()
+        
+        # Create a complete date range to show months with zero visits
+        if not monthly_visits.empty:
             # Get the date range from first visit to last visit
             min_date = data['Dates'].min()
             max_date = data['Dates'].max()
             
-            # Create weekly date range
-            complete_weeks = pd.date_range(start=min_date, end=max_date, freq='W')
+            # Create monthly date range
+            complete_months = pd.date_range(start=min_date, end=max_date, freq='M')
             
-            # Reindex to include all weeks, filling missing with 0
-            weekly_visits = weekly_visits.reindex(complete_weeks, fill_value=0)
+            # Reindex to include all months, filling missing with 0
+            monthly_visits = monthly_visits.reindex(complete_months, fill_value=0)
             
-            # Create readable labels for weeks (start - end format)
-            week_labels = []
-            for week_end in weekly_visits.index:
-                week_start = week_end - pd.Timedelta(days=6)
-                # Format: "7-11 Jul 2025" style
-                if week_start.month == week_end.month:
-                    # Same month
-                    label = f"{week_start.day}-{week_end.day} {week_end.strftime('%b %Y')}"
-                else:
-                    # Different months
-                    label = f"{week_start.strftime('%d %b')}-{week_end.strftime('%d %b %Y')}"
-                week_labels.append(label)
+            # Apply weekly average calculation if checkbox is checked
+            display_visits = monthly_visits.copy()
+            if show_weekly_average:
+                display_visits = display_visits / 4
             
-            # Display weekly visits data
-            weekly_data = pd.DataFrame({
-                'Week': week_labels,
-                'Visits': weekly_visits.values
+            # Create readable labels for months
+            month_labels = []
+            for month_end in monthly_visits.index:
+                # Format: "Jan 2025" style
+                label = month_end.strftime('%b %Y')
+                month_labels.append(label)
+            
+            # Display monthly visits data
+            visits_column_name = 'Average Visits per Week' if show_weekly_average else 'Visits'
+            monthly_data = pd.DataFrame({
+                'Month': month_labels,
+                visits_column_name: display_visits.values
             })
-            st.dataframe(weekly_data)
+            st.dataframe(monthly_data)
             
-            # Plot line graph of weekly visits
+            # Plot line graph of monthly visits
             try:
                 fig, ax = plt.subplots(figsize=(12, 6))
-                ax.plot(weekly_visits.index, weekly_visits.values, marker="o", linestyle="-", linewidth=2, markersize=6)
-                ax.set_xlabel("Week Ending")
-                ax.set_ylabel("Number of Visits")
-                ax.set_title("Number of Visits per Week (Including Weeks with 0 Visits)")
+                ax.plot(monthly_visits.index, display_visits.values, marker="o", linestyle="-", linewidth=2, markersize=6)
+                ax.set_xlabel("Month")
+                if show_weekly_average:
+                    ax.set_ylabel("Average Number of Visits per Week")
+                    ax.set_title("Average Number of Visits per Week by Month")
+                else:
+                    ax.set_ylabel("Number of Visits")
+                    ax.set_title("Number of Visits per Month")
                 ax.grid(True)
                 plt.xticks(rotation=45)
                 
-                # Add text annotations for weeks with visits
-                for i, (date, visits) in enumerate(zip(weekly_visits.index, weekly_visits.values)):
+                # Add text annotations for months with visits
+                for i, (date, visits) in enumerate(zip(monthly_visits.index, display_visits.values)):
                     if visits > 0:
-                        ax.annotate(f'{visits}', (date, visits), textcoords="offset points", xytext=(0,10), ha='center')
+                        # Format the annotation value
+                        if show_weekly_average:
+                            annotation_text = f'{visits:.1f}'
+                        else:
+                            annotation_text = f'{int(visits)}'
+                        ax.annotate(annotation_text, (date, visits), textcoords="offset points", xytext=(0,10), ha='center')
                 
                 st.pyplot(fig)
             except Exception as e:
-                st.error(f"Error creating weekly visits plot: {e}")
+                st.error(f"Error creating monthly visits plot: {e}")
         else:
-            st.info("No data available for weekly visits.")
+            st.info("No data available for monthly visits.")
 
     with tab5:
         st.subheader("Map")
