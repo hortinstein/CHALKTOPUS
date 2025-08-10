@@ -142,9 +142,13 @@ data["Dates"] = pd.to_datetime(data["Dates"])
 data = data.sort_values("Dates")
 
 # Plot calendar heatmap using calplot
-fig, ax = calplot.calplot(data.set_index("Dates")["Daily_Score"], cmap="coolwarm", colorbar=True)
-plt.show()
-st.pyplot(fig)
+try:
+    fig, ax = calplot.calplot(data.set_index("Dates")["Daily_Score"], cmap="coolwarm", colorbar=True)
+    plt.show()
+    st.pyplot(fig)
+except Exception as e:
+    st.error(f"Error creating calendar heatmap: {e}")
+    st.info("The calendar heatmap could not be generated. This may be due to a version compatibility issue between pandas and calplot. Please ensure you have calplot >= 0.1.7.5 installed.")
 # Plot line graph of daily scores
 plt.figure(figsize=(12, 6))
 plt.plot(data["Dates"], data["Daily_Score"], marker="o", linestyle="-")

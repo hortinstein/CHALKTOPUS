@@ -184,6 +184,7 @@ if data is not None:
             st.pyplot(fig)
         except Exception as e:
             st.error(f"Error creating calendar plot: {e}")
+            st.info("The calendar heatmap could not be generated. This may be due to a version compatibility issue between pandas and calplot. Please ensure you have calplot >= 0.1.7.5 installed.")
 
         # Plot line graph of daily scores
         try:
