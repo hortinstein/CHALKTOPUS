@@ -4,6 +4,7 @@ import calplot
 # Display the updated table
 import streamlit as st
 import math
+import numpy as np
 
 # Define different scoring methods
 def get_scoring_methods():
@@ -141,14 +142,41 @@ data["Dates"] = pd.to_datetime(data["Dates"])
 # Sort by date
 data = data.sort_values("Dates")
 
-# Plot calendar heatmap using calplot
+# Plot calendar heatmap using calplot with improved error handling
 try:
-    fig, ax = calplot.calplot(data.set_index("Dates")["Daily_Score"], cmap="coolwarm", colorbar=True)
-    plt.show()
-    st.pyplot(fig)
+    # Prepare data for calendar plot with proper validation
+    calendar_data = data.set_index("Dates")["Daily_Score"]
+    
+    # Remove any NaN or infinite values that might cause issues
+    calendar_data = calendar_data.dropna()
+    calendar_data = calendar_data[calendar_data.notna()]
+    
+    if len(calendar_data) == 0:
+        st.warning("No valid data available for calendar heatmap.")
+    else:
+        fig, ax = calplot.calplot(calendar_data, cmap="coolwarm", colorbar=True)
+        plt.show()
+        st.pyplot(fig)
+        
+except AttributeError as e:
+    if "pivot" in str(e).lower():
+        st.error("Calendar heatmap error: Pandas compatibility issue detected.")
+        st.info("This error may be due to incompatible versions of pandas and calplot. The pivot() method signature has changed in newer pandas versions.")
+        st.info("**Solution:** Try upgrading calplot to version >= 0.1.7.5 or downgrading pandas to < 2.0 if needed.")
+    else:
+        st.error(f"Calendar heatmap error: {e}")
+        
+except ValueError as e:
+    st.error(f"Calendar heatmap data error: {e}")
+    st.info("This may be due to invalid date ranges or data values. Please check your data format.")
+    
 except Exception as e:
     st.error(f"Error creating calendar heatmap: {e}")
-    st.info("The calendar heatmap could not be generated. This may be due to a version compatibility issue between pandas and calplot. Please ensure you have calplot >= 0.1.7.5 installed.")
+    st.info("The calendar heatmap could not be generated. This may be due to a version compatibility issue between pandas and calplot.")
+    st.info("**Troubleshooting:**")
+    st.info("1. Ensure you have calplot >= 0.1.7.5 installed")
+    st.info("2. Check pandas version compatibility")
+    st.info("3. Verify your data contains valid dates and numeric values")
 # Plot line graph of daily scores
 plt.figure(figsize=(12, 6))
 plt.plot(data["Dates"], data["Daily_Score"], marker="o", linestyle="-")

@@ -6,6 +6,7 @@ from streamlit_folium import st_folium
 import folium
 import json
 import seaborn as sns
+import numpy as np
 
 st.set_page_config('🧗‍♂️chalktopus🐙', initial_sidebar_state="collapsed")
 
@@ -177,14 +178,43 @@ if data is not None:
     data = data.sort_values("Dates")
     
     with tab1: 
-        # Plot calendar heatmap using calplot
+        # Plot calendar heatmap using calplot with improved error handling
         try:
             st.subheader("Calendar Heatmap")
-            fig, ax = calplot.calplot(data.set_index("Dates")["Display_Value"], cmap="coolwarm", colorbar=True)
-            st.pyplot(fig)
+            
+            # Prepare data for calendar plot with proper validation
+            calendar_data = data.set_index("Dates")["Display_Value"]
+            
+            # Remove any NaN or infinite values that might cause issues
+            calendar_data = calendar_data.dropna()
+            calendar_data = calendar_data[np.isfinite(calendar_data)]
+            
+            if len(calendar_data) == 0:
+                st.warning("No valid data available for calendar heatmap.")
+            else:
+                # Create calendar heatmap with error handling for pandas compatibility
+                fig, ax = calplot.calplot(calendar_data, cmap="coolwarm", colorbar=True)
+                st.pyplot(fig)
+                
+        except AttributeError as e:
+            if "pivot" in str(e).lower():
+                st.error("Calendar heatmap error: Pandas compatibility issue detected.")
+                st.info("This error may be due to incompatible versions of pandas and calplot. The pivot() method signature has changed in newer pandas versions.")
+                st.info("**Solution:** Try upgrading calplot to version >= 0.1.7.5 or downgrading pandas to < 2.0 if needed.")
+            else:
+                st.error(f"Calendar heatmap error: {e}")
+                
+        except ValueError as e:
+            st.error(f"Calendar heatmap data error: {e}")
+            st.info("This may be due to invalid date ranges or data values. Please check your data format.")
+            
         except Exception as e:
-            st.error(f"Error creating calendar plot: {e}")
-            st.info("The calendar heatmap could not be generated. This may be due to a version compatibility issue between pandas and calplot. Please ensure you have calplot >= 0.1.7.5 installed.")
+            st.error(f"Error creating calendar heatmap: {e}")
+            st.info("The calendar heatmap could not be generated. This may be due to a version compatibility issue between pandas and calplot.")
+            st.info("**Troubleshooting:**")
+            st.info("1. Ensure you have calplot >= 0.1.7.5 installed")
+            st.info("2. Check pandas version compatibility")
+            st.info("3. Verify your data contains valid dates and numeric values")
 
         # Plot line graph of daily scores
         try:
@@ -281,7 +311,7 @@ if data is not None:
         # Calculate the number of times you went per month
         # Use pd.Grouper to properly group by month, accounting for different years
         data_for_monthly = data.set_index('Dates')
-        monthly_visits = data_for_monthly.groupby(pd.Grouper(freq='M')).size()
+        monthly_visits = data_for_monthly.groupby(pd.Grouper(freq='ME')).size()
         
         # Create a complete date range to show months with zero visits
         if not monthly_visits.empty:
@@ -290,7 +320,7 @@ if data is not None:
             max_date = data['Dates'].max()
             
             # Create monthly date range
-            complete_months = pd.date_range(start=min_date, end=max_date, freq='M')
+            complete_months = pd.date_range(start=min_date, end=max_date, freq='ME')
             
             # Reindex to include all months, filling missing with 0
             monthly_visits = monthly_visits.reindex(complete_months, fill_value=0)

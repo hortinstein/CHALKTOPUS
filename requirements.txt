@@ -1,6 +1,7 @@
 matplotlib
 calplot>=0.1.7.5
-pandas
+pandas>=1.3.0
 folium
 streamlit_folium
 seaborn
+numpy
