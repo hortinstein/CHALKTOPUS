@@ -10,8 +10,34 @@ import numpy as np
 
 st.set_page_config('🧗‍♂️chalktopus🐙', initial_sidebar_state="collapsed")
 
-# Define grade weightings
-weightings = {"v0": 1, "v1": 2, "v2": 4, "v3": 8, "v4": 12}
+# Define different scoring methods
+def get_scoring_methods():
+    """Return dictionary of different scoring methods for climbing grades"""
+    return {
+        "Original Exponential": {"vb": 0.5, "v0": 1, "v1": 2, "v2": 4, "v3": 8, "v4": 12},
+        "Extended Exponential": {"vb": 0.5, "v0": 1, "v1": 2, "v2": 4, "v3": 8, "v4": 12, "v5": 20, "v6": 32},
+        "Fibonacci Progression": {"vb": 1, "v0": 1, "v1": 2, "v2": 3, "v3": 5, "v4": 8, "v5": 13, "v6": 21},
+        "Power Scaling (x^1.5)": {
+            "vb": round(0.5 ** 1.5, 1), 
+            "v0": round(1 ** 1.5, 1), 
+            "v1": round(2 ** 1.5, 1), 
+            "v2": round(3 ** 1.5, 1), 
+            "v3": round(4 ** 1.5, 1), 
+            "v4": round(5 ** 1.5, 1),
+            "v5": round(6 ** 1.5, 1),
+            "v6": round(7 ** 1.5, 1)
+        },
+        "Climbing Difficulty Curve (1.5x)": {
+            "vb": 1,
+            "v0": 2,
+            "v1": 3,
+            "v2": 5,
+            "v3": 7,
+            "v4": 11,
+            "v5": 16,
+            "v6": 24
+        }
+    }
 
 # Function to load data from public Google Sheets
 def load_data_from_public_sheets():
@@ -50,6 +76,35 @@ def load_data_from_public_sheets():
 data = load_data_from_public_sheets()
 
 if data is not None:
+    # Scoring method selection in sidebar
+    st.sidebar.header("Scoring Options")
+    scoring_methods = get_scoring_methods()
+    selected_method = st.sidebar.selectbox(
+        "Choose Scoring Method:",
+        options=list(scoring_methods.keys()),
+        index=0,
+        help="Select different scoring algorithms for climbing grade progression"
+    )
+    
+    # Get the selected weightings
+    weightings = scoring_methods[selected_method]
+    
+    # Display current scoring method info
+    st.sidebar.subheader("Current Scoring Values")
+    for grade, weight in weightings.items():
+        st.sidebar.write(f"{grade.upper()}: {weight}")
+    
+    # Display scoring method descriptions
+    scoring_descriptions = {
+        "Original Exponential": "Classic exponential doubling pattern (1, 2, 4, 8, 12)",
+        "Extended Exponential": "Continues exponential pattern to higher grades",
+        "Fibonacci Progression": "Natural growth following Fibonacci sequence",
+        "Power Scaling (x^1.5)": "Mathematical power scaling based on grade^1.5",
+        "Climbing Difficulty Curve (1.5x)": "Reflects real climbing difficulty progression (~1.5x multiplier)"
+    }
+    
+    st.sidebar.info(scoring_descriptions[selected_method])
+    
     # Helper function to parse a value
     def parse_value(value):
         if pd.isna(value):
@@ -92,14 +147,14 @@ if data is not None:
             return 0, 0
 
     # Add new columns for completed and tried counts
-    for col in ["vb", "v0", "v1", "v2", "v3", "v4"]:
+    for col in ["vb", "v0", "v1", "v2", "v3", "v4", "v5", "v6"]:
         if col in data.columns:
             data[f"{col}_completed"] = None
             data[f"{col}_tried"] = None
 
     # Process each row and column
     for index, row in data.iterrows():
-        for col in ["vb", "v0", "v1", "v2", "v3", "v4"]:
+        for col in ["vb", "v0", "v1", "v2", "v3", "v4", "v5", "v6"]:
             if col in data.columns:
                 value = row[col]
                 completed, tried = parse_value(value)
@@ -112,6 +167,7 @@ if data is not None:
 
     # Display the title
     st.title("🧗‍♂️chalktopus🐙")
+    st.subheader(f"Current Scoring Method: {selected_method}")
 
     # Add sidebar controls for grade filtering
     st.sidebar.header("Display Options")
@@ -122,8 +178,10 @@ if data is not None:
     # Grade selector (only show when in completed count mode)
     selected_grade = None
     if show_completed_counts:
-        grade_options = ["vb", "v0", "v1", "v2", "v3", "v4"]
-        selected_grade = st.sidebar.selectbox("Select Grade to Display", grade_options, index=1)
+        grade_options = ["vb", "v0", "v1", "v2", "v3", "v4", "v5", "v6"]
+        # Filter to only show grades that are in the current data columns
+        available_grades = [grade for grade in grade_options if grade in data.columns]
+        selected_grade = st.sidebar.selectbox("Select Grade to Display", available_grades, index=1 if len(available_grades) > 1 else 0)
 
 
     # Separate completed and tried data into tables
@@ -427,8 +485,10 @@ if data is not None:
         
         # Function to plot bar graphs for each difficulty level
         def plot_difficulty_graphs(data, show_tried):
-            difficulties = ["vb", "v0", "v1", "v2", "v3", "v4"]
-            for difficulty in difficulties:
+            difficulties = ["vb", "v0", "v1", "v2", "v3", "v4", "v5", "v6"]
+            # Filter to only show grades that are in the current data columns
+            available_difficulties = [diff for diff in difficulties if diff in data.columns]
+            for difficulty in available_difficulties:
                 fig, ax = plt.subplots(figsize=(10, 5))
                 sns.barplot(x=data["Dates"], y=data[f"{difficulty}_completed"], ax=ax, label="Completed")
                 if show_tried:
