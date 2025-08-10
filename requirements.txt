@@ -1,5 +1,5 @@
 matplotlib
-calplot
+calplot>=0.1.7.5
 pandas
 folium
 streamlit_folium
