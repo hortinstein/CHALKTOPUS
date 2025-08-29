@@ -444,22 +444,55 @@ if data is not None:
                 st.error(f"Error loading locations.json: {e}")
                 return {}
         
-        def create_map(locations):
+        def calculate_location_visits():
+            """Calculate visit counts for each location from the data"""
+            visit_counts = {}
+            
+            # Create mapping between CSV location names and location keys
+            location_mapping = {
+                'CENTRAL ROCK': 'CENTRAL ROCK',
+                'MOVEMENT': 'MOVEMENT, VA',  # Default to VA if not specified
+                'VERTICALVENTURES': 'VERTICALVENTURES',
+                'UPLIFT': 'UPLIFT'
+            }
+            
+            # Count visits per location
+            location_visits = data['Location'].value_counts()
+            
+            for csv_location, count in location_visits.items():
+                # Map CSV location to JSON key
+                json_key = location_mapping.get(csv_location, csv_location)
+                visit_counts[json_key] = int(count)
+            
+            return visit_counts
+        
+        def create_map(locations, visit_counts):
             m = folium.Map(location=[20,0], zoom_start=2)
-            for loc in locations.values():
+            for key, loc in locations.items():
+                # Get visit count for this location
+                visits = visit_counts.get(key, 0)
+                
+                # Make location name ALL CAPS
+                location_name_caps = loc['name'].upper()
+                
+                # Create popup with visit count
+                popup_html = f"<b>{location_name_caps}</b><br>{loc['address']}<br>Visits: {visits}<br><a href='{loc['website']}' target='_blank'>Website</a>"
+                
                 folium.Marker(
                     location=[loc['latitude'], loc['longitude']],
-                    popup=f"<b>{loc['name']}</b><br>{loc['address']}<br><a href='{loc['website']}' target='_blank'>Website</a>",
-                    tooltip=loc['name'],
+                    popup=popup_html,
+                    tooltip=location_name_caps,
                     icon=folium.DivIcon(html=f"<div style='font-size: 24px;'>🧗‍♂️</div>")
                 ).add_to(m)
             return m
         
-        # Load locations and create map
+        # Load locations and calculate visits
         try:
             locations = load_locations()
+            visit_counts = calculate_location_visits()
+            
             if locations:
-                map_ = create_map(locations)
+                map_ = create_map(locations, visit_counts)
                 # Use a unique key each time to prevent caching issues
                 map_data = st_folium(
                     map_, 
@@ -469,11 +502,44 @@ if data is not None:
                     returned_objects=["last_object_clicked"]
                 )
                 
-                # Display clicked location info
+                # Display clicked location info with visit count
                 if map_data['last_object_clicked'] is not None:
                     clicked_data = map_data['last_object_clicked']
                     if clicked_data and 'tooltip' in clicked_data:
-                        st.success(f"Selected location: {clicked_data['tooltip']}")
+                        clicked_location = clicked_data['tooltip']
+                        # Find the visit count for this location
+                        visits = 0
+                        for key, loc in locations.items():
+                            if loc['name'].upper() == clicked_location:
+                                visits = visit_counts.get(key, 0)
+                                break
+                        st.success(f"Selected location: {clicked_location} (Visits: {visits})")
+                
+                # Add pie chart showing visit distribution
+                st.subheader("Visit Distribution")
+                if visit_counts:
+                    # Prepare data for pie chart
+                    chart_data = []
+                    chart_labels = []
+                    for key, visits in visit_counts.items():
+                        if visits > 0:  # Only show locations with visits
+                            if key in locations:
+                                location_name = locations[key]['name'].upper()
+                            else:
+                                location_name = key.upper()
+                            chart_labels.append(location_name)
+                            chart_data.append(visits)
+                    
+                    if chart_data:
+                        # Create pie chart
+                        fig, ax = plt.subplots(figsize=(8, 8))
+                        ax.pie(chart_data, labels=chart_labels, autopct='%1.1f%%', startangle=90)
+                        ax.set_title("Distribution of Visits by Location")
+                        st.pyplot(fig)
+                    else:
+                        st.info("No visit data available for pie chart.")
+                else:
+                    st.info("No visit data available.")
             else:
                 st.error("No locations found to display on map.")
         except Exception as e:
