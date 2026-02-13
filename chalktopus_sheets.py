@@ -76,6 +76,9 @@ def load_data_from_public_sheets():
 data = load_data_from_public_sheets()
 
 if data is not None:
+    # Clean up location names: strip whitespace for consistency
+    data["Location"] = data["Location"].str.strip()
+
     # Scoring method selection in sidebar
     st.sidebar.header("Scoring Options")
     scoring_methods = get_scoring_methods()
@@ -109,37 +112,37 @@ if data is not None:
     def parse_value(value):
         if pd.isna(value):
             return 0, 0
-        
+
         # If it's a string, check for the format pattern
         if isinstance(value, str):
             parts = value.split()
-            
+
             # Format: "1 tried 3 other" or similar variations
             if len(parts) >= 3 and "tried" in parts:
                 # Find position of "tried" in the parts
                 tried_index = parts.index("tried")
-                
+
                 # Get completed count (number before "tried")
                 completed = int(parts[tried_index-1]) if tried_index > 0 and parts[tried_index-1].isdigit() else 0
-                
+
                 # Get tried count (number after "tried")
                 tried = int(parts[tried_index+1]) if tried_index+1 < len(parts) and parts[tried_index+1].isdigit() else 0
-                
+
                 return completed, tried
-            
+
             # Just "tried X" format
             elif "tried" in parts:
                 # Find all numbers in the string
                 numbers = [int(s) for s in parts if s.isdigit()]
                 if numbers:
                     return 0, numbers[0]
-            
+
             # Try to parse as a plain number if it contains only digits
             elif value.isdigit():
                 return int(value), 0
-                
+
             return 0, 0
-        
+
         # If it's a number
         try:
             return int(value), 0
