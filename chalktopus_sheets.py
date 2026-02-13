@@ -76,8 +76,34 @@ def load_data_from_public_sheets():
 data = load_data_from_public_sheets()
 
 if data is not None:
-    # Clean up location names: strip whitespace for consistency
-    data["Location"] = data["Location"].str.strip()
+    # Clean up location names: normalize for consistency
+    def normalize_location(loc):
+        if pd.isna(loc):
+            return loc
+        # Uppercase and strip
+        loc = str(loc).upper().strip()
+        # Normalize whitespace: collapse multiple spaces, normalize around commas
+        loc = ' '.join(loc.split())            # collapse whitespace
+        loc = loc.replace(' ,', ',').replace(', ', ',')  # remove spaces around commas
+        # Re-add single space after comma for standard format
+        loc = loc.replace(',', ', ')
+        # Strip again in case of trailing spaces
+        loc = loc.strip()
+
+        # Map known variations to canonical location keys
+        location_aliases = {
+            'VERTICALVENTURES': 'VERTICAL VENTURES',
+            'VERTICAL VENTURES': 'VERTICAL VENTURES',
+            'CENTRAL ROCK': 'CENTRAL ROCK',
+            'MOVEMENT, VA': 'MOVEMENT, VA',
+            'MOVEMENT, MD': 'MOVEMENT, MD',
+            'UPLIFT, WA': 'UPLIFT',
+            'UPLIFT': 'UPLIFT',
+            'EDINBURGH INTERNATIONAL CLIMBING ARENA': 'EDINBURGH INTERNATIONAL CLIMBING ARENA',
+        }
+        return location_aliases.get(loc, loc)
+
+    data["Location"] = data["Location"].apply(normalize_location)
 
     # Scoring method selection in sidebar
     st.sidebar.header("Scoring Options")
@@ -450,23 +476,17 @@ if data is not None:
         def calculate_location_visits():
             """Calculate visit counts for each location from the data"""
             visit_counts = {}
-            
-            # Create mapping between CSV location names and location keys
-            location_mapping = {
-                'CENTRAL ROCK': 'CENTRAL ROCK',
-                'MOVEMENT': 'MOVEMENT, VA',  # Default to VA if not specified
-                'VERTICAL VENTURES': 'VERTICAL VENTURES',
-                'UPLIFT': 'UPLIFT'
-            }
-            
-            # Count visits per location
+
+            # Count visits per location (already normalized upstream)
             location_visits = data['Location'].value_counts()
-            
-            for csv_location, count in location_visits.items():
-                # Map CSV location to JSON key
-                json_key = location_mapping.get(csv_location, csv_location)
-                visit_counts[json_key] = int(count)
-            
+
+            for location, count in location_visits.items():
+                # Accumulate in case multiple raw names map to same key
+                if location in visit_counts:
+                    visit_counts[location] += int(count)
+                else:
+                    visit_counts[location] = int(count)
+
             return visit_counts
         
         def create_map(locations, visit_counts):
