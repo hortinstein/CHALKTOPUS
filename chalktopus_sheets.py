@@ -455,7 +455,7 @@ if data is not None:
             location_mapping = {
                 'CENTRAL ROCK': 'CENTRAL ROCK',
                 'MOVEMENT': 'MOVEMENT, VA',  # Default to VA if not specified
-                'VERTICALVENTURES': 'VERTICALVENTURES',
+                'VERTICAL VENTURES': 'VERTICAL VENTURES',
                 'UPLIFT': 'UPLIFT'
             }
             
