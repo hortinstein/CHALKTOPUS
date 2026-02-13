@@ -5,7 +5,6 @@ import streamlit as st
 from streamlit_folium import st_folium
 import folium
 import json
-import re
 import seaborn as sns
 import numpy as np
 
@@ -77,11 +76,8 @@ def load_data_from_public_sheets():
 data = load_data_from_public_sheets()
 
 if data is not None:
-    # Clean up location names and column values: strip whitespace for consistency
+    # Clean up location names: strip whitespace for consistency
     data["Location"] = data["Location"].str.strip()
-    for col in ["vb", "v0", "v1", "v2", "v3", "v4", "v5", "v6"]:
-        if col in data.columns:
-            data[col] = data[col].apply(lambda x: x.strip() if isinstance(x, str) else x)
 
     # Scoring method selection in sidebar
     st.sidebar.header("Scoring Options")
@@ -117,82 +113,41 @@ if data is not None:
         if pd.isna(value):
             return 0, 0
 
-        # If it's a number (int or float), return it directly
-        if isinstance(value, (int, float)):
-            return int(round(value)), 0
-
-        # If it's a string, clean and parse
+        # If it's a string, check for the format pattern
         if isinstance(value, str):
-            value = value.strip()
-            if not value:
-                return 0, 0
-
-            # Normalize: insert space around "tried" if missing (e.g. "1tried" -> "1 tried", "tried1" -> "tried 1")
-            value = re.sub(r'(\d)\s*tried', r'\1 tried', value)
-            value = re.sub(r'tried\s*(\d)', r'tried \1', value)
-
             parts = value.split()
 
-            # Format: "X tried Y other" or "X tried Y others"
-            if "tried" in parts:
+            # Format: "1 tried 3 other" or similar variations
+            if len(parts) >= 3 and "tried" in parts:
+                # Find position of "tried" in the parts
                 tried_index = parts.index("tried")
 
                 # Get completed count (number before "tried")
-                completed = 0
-                if tried_index > 0:
-                    try:
-                        completed = int(round(float(parts[tried_index-1])))
-                    except (ValueError, TypeError):
-                        completed = 0
+                completed = int(parts[tried_index-1]) if tried_index > 0 and parts[tried_index-1].isdigit() else 0
 
                 # Get tried count (number after "tried")
-                tried = 0
-                if tried_index + 1 < len(parts):
-                    try:
-                        tried = int(round(float(parts[tried_index+1])))
-                    except (ValueError, TypeError):
-                        tried = 0
-
-                # If "tried" appears but no tried count follows, count as 1 tried
-                if tried == 0 and tried_index + 1 >= len(parts):
-                    tried = 1
-                # "tried" followed by non-numeric words (e.g. "1 tried close")
-                if tried == 0 and tried_index + 1 < len(parts):
-                    # Check if the word after "tried" is a non-numeric descriptor
-                    next_word = parts[tried_index + 1]
-                    if not next_word.replace('.', '', 1).isdigit():
-                        tried = 1
-                # "tried X" at the start with no completed number before
-                if tried_index == 0:
-                    # Look for any number after "tried"
-                    for p in parts[1:]:
-                        try:
-                            tried = int(round(float(p)))
-                            break
-                        except (ValueError, TypeError):
-                            continue
-                    if tried == 0:
-                        tried = 1  # bare "tried" means at least 1 attempt
+                tried = int(parts[tried_index+1]) if tried_index+1 < len(parts) and parts[tried_index+1].isdigit() else 0
 
                 return completed, tried
 
-            # Words that indicate an attempt but no completion (kinda, almost, etc.)
-            attempt_words = ["kinda", "almost", "close", "nearly"]
-            if any(word in value.lower() for word in attempt_words):
-                return 0, 1
+            # Just "tried X" format
+            elif "tried" in parts:
+                # Find all numbers in the string
+                numbers = [int(s) for s in parts if s.isdigit()]
+                if numbers:
+                    return 0, numbers[0]
 
-            # Try to parse as a plain number (handles "3", "2.5", "1?", "1ish", etc.)
-            try:
-                # Extract leading number from string (e.g. "1?" -> 1, "2.5" -> 3, "1ish" -> 1)
-                match = re.match(r'^(\d+\.?\d*)', value)
-                if match:
-                    return int(round(float(match.group(1)))), 0
-            except (ValueError, TypeError):
-                pass
+            # Try to parse as a plain number if it contains only digits
+            elif value.isdigit():
+                return int(value), 0
 
             return 0, 0
 
-        return 0, 0
+        # If it's a number
+        try:
+            return int(value), 0
+        except (ValueError, TypeError):
+            return 0, 0
 
     # Add new columns for completed and tried counts
     for col in ["vb", "v0", "v1", "v2", "v3", "v4", "v5", "v6"]:
