@@ -10,6 +10,16 @@ import numpy as np
 
 st.set_page_config('🧗‍♂️chalktopus🐙', initial_sidebar_state="collapsed")
 
+
+@st.cache_data
+def load_locations():
+    try:
+        with open('locations.json') as f:
+            return json.load(f)
+    except Exception as e:
+        st.error(f"Error loading locations.json: {e}")
+        return {}
+
 # Define different scoring methods
 def get_scoring_methods():
     """Return dictionary of different scoring methods for climbing grades"""
@@ -464,15 +474,7 @@ if data is not None:
 
     with tab5:
         st.subheader("Map")
-        
-        def load_locations():
-            try:
-                with open('locations.json') as f:
-                    return json.load(f)
-            except Exception as e:
-                st.error(f"Error loading locations.json: {e}")
-                return {}
-        
+
         def calculate_location_visits():
             """Calculate visit counts for each location from the data"""
             visit_counts = {}
@@ -516,12 +518,11 @@ if data is not None:
             
             if locations:
                 map_ = create_map(locations, visit_counts)
-                # Use a unique key each time to prevent caching issues
                 map_data = st_folium(
-                    map_, 
-                    width=700, 
-                    height=500, 
-                    key=None,  # Let streamlit auto-generate key
+                    map_,
+                    width=700,
+                    height=500,
+                    key="climbing_map",
                     returned_objects=["last_object_clicked"]
                 )
                 
