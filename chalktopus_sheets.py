@@ -20,6 +20,20 @@ def load_locations():
         st.error(f"Error loading locations.json: {e}")
         return {}
 
+
+@st.cache_data
+def calculate_location_visits(data):
+    """Calculate visit counts for each location from the data"""
+    visit_counts = {}
+    location_visits = data['Location'].value_counts()
+    for location, count in location_visits.items():
+        if location in visit_counts:
+            visit_counts[location] += int(count)
+        else:
+            visit_counts[location] = int(count)
+    return visit_counts
+
+
 # Define different scoring methods
 def get_scoring_methods():
     """Return dictionary of different scoring methods for climbing grades"""
@@ -475,22 +489,6 @@ if data is not None:
     with tab5:
         st.subheader("Map")
 
-        def calculate_location_visits():
-            """Calculate visit counts for each location from the data"""
-            visit_counts = {}
-
-            # Count visits per location (already normalized upstream)
-            location_visits = data['Location'].value_counts()
-
-            for location, count in location_visits.items():
-                # Accumulate in case multiple raw names map to same key
-                if location in visit_counts:
-                    visit_counts[location] += int(count)
-                else:
-                    visit_counts[location] = int(count)
-
-            return visit_counts
-        
         def create_map(locations, visit_counts):
             m = folium.Map(location=[20,0], zoom_start=2)
             for key, loc in locations.items():
@@ -514,10 +512,19 @@ if data is not None:
         # Load locations and calculate visits
         try:
             locations = load_locations()
-            visit_counts = calculate_location_visits()
-            
+            visit_counts = calculate_location_visits(data)
+
             if locations:
-                map_ = create_map(locations, visit_counts)
+                # Cache the map object in session_state so the same Folium map
+                # (same internal ID → same HTML) is reused across reruns.
+                # Without this, every click rebuilds the map with a new random
+                # Folium ID, which forces st_folium to fully re-render in the browser.
+                map_cache_key = str(visit_counts)
+                if st.session_state.get('_map_cache_key') != map_cache_key:
+                    st.session_state._climbing_map = create_map(locations, visit_counts)
+                    st.session_state._map_cache_key = map_cache_key
+                map_ = st.session_state._climbing_map
+
                 map_data = st_folium(
                     map_,
                     width=700,
