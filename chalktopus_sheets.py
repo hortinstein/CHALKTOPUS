@@ -1,3 +1,5 @@
+import threading
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import calplot
@@ -7,8 +9,22 @@ import folium
 import json
 import seaborn as sns
 import numpy as np
+import uvicorn
 
 st.set_page_config('🧗‍♂️chalktopus🐙', initial_sidebar_state="collapsed")
+
+
+@st.cache_resource
+def start_api_server():
+    thread = threading.Thread(
+        target=lambda: uvicorn.run("api:app", host="0.0.0.0", port=8000, log_level="error"),
+        daemon=True,
+    )
+    thread.start()
+    return thread
+
+
+start_api_server()
 
 
 @st.cache_data
