@@ -1,0 +1,70 @@
+{
+  "original_exponential": {
+    "scoring_method": "original_exponential",
+    "weights": {
+      "vb": 0.5,
+      "v0": 1,
+      "v1": 2,
+      "v2": 4,
+      "v3": 8,
+      "v4": 12
+    },
+    "total_sessions": 84
+  },
+  "extended_exponential": {
+    "scoring_method": "extended_exponential",
+    "weights": {
+      "vb": 0.5,
+      "v0": 1,
+      "v1": 2,
+      "v2": 4,
+      "v3": 8,
+      "v4": 12,
+      "v5": 20,
+      "v6": 32
+    },
+    "total_sessions": 84
+  },
+  "fibonacci": {
+    "scoring_method": "fibonacci",
+    "weights": {
+      "vb": 1,
+      "v0": 1,
+      "v1": 2,
+      "v2": 3,
+      "v3": 5,
+      "v4": 8,
+      "v5": 13,
+      "v6": 21
+    },
+    "total_sessions": 84
+  },
+  "power_scaling": {
+    "scoring_method": "power_scaling",
+    "weights": {
+      "vb": 0.4,
+      "v0": 1.0,
+      "v1": 2.8,
+      "v2": 5.2,
+      "v3": 8.0,
+      "v4": 11.2,
+      "v5": 14.7,
+      "v6": 18.5
+    },
+    "total_sessions": 84
+  },
+  "difficulty_curve": {
+    "scoring_method": "difficulty_curve",
+    "weights": {
+      "vb": 1,
+      "v0": 2,
+      "v1": 3,
+      "v2": 5,
+      "v3": 7,
+      "v4": 11,
+      "v5": 16,
+      "v6": 24
+    },
+    "total_sessions": 84
+  }
+}
