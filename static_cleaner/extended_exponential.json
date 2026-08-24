@@ -10,7 +10,7 @@
     "v5": 20,
     "v6": 32
   },
-  "total_sessions": 271,
+  "total_sessions": 272,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -5414,7 +5414,7 @@
     },
     {
       "Location": "MOVEMENT, VA",
-      "Dates": 0,
+      "Dates": "2026-08-22",
       "daily_score": 23.5,
       "vb_completed": 1,
       "vb_tried": 0,
@@ -5431,6 +5431,26 @@
       "v5_completed": 0,
       "v5_tried": 0,
       "Comments": 0
+    },
+    {
+      "Location": "MOVEMENT, VA",
+      "Dates": "2026-08-23",
+      "daily_score": 15.5,
+      "vb_completed": 1,
+      "vb_tried": 0,
+      "v0_completed": 1,
+      "v0_tried": 0,
+      "v1_completed": 1,
+      "v1_tried": 0,
+      "v2_completed": 1,
+      "v2_tried": 0,
+      "v3_completed": 1,
+      "v3_tried": 3,
+      "v4_completed": 0,
+      "v4_tried": 1,
+      "v5_completed": 0,
+      "v5_tried": 0,
+      "Comments": "long purple, check grade"
     }
   ]
 }
