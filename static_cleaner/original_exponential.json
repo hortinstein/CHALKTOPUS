@@ -8,7 +8,7 @@
     "v3": 8,
     "v4": 12
   },
-  "total_sessions": 275,
+  "total_sessions": 276,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -5509,6 +5509,26 @@
       "v5_completed": 0,
       "v5_tried": 0,
       "Comments": "hit ankle falling off of a v3 pretty bad so called it early.  hopefully can run tonight"
+    },
+    {
+      "Location": "MOVEMENT, MD",
+      "Dates": "2026-09-01",
+      "daily_score": 27.5,
+      "vb_completed": 1,
+      "vb_tried": 0,
+      "v0_completed": 1,
+      "v0_tried": 0,
+      "v1_completed": 1,
+      "v1_tried": 0,
+      "v2_completed": 1,
+      "v2_tried": 0,
+      "v3_completed": 1,
+      "v3_tried": 0,
+      "v4_completed": 1,
+      "v4_tried": 1,
+      "v5_completed": 0,
+      "v5_tried": 0,
+      "Comments": "seems to be ok, need new shows"
     }
   ]
 }
