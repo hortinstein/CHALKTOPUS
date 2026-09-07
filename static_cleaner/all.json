@@ -9,7 +9,7 @@
       "v3": 8,
       "v4": 12
     },
-    "total_sessions": 277
+    "total_sessions": 278
   },
   "extended_exponential": {
     "scoring_method": "extended_exponential",
@@ -23,7 +23,7 @@
       "v5": 20,
       "v6": 32
     },
-    "total_sessions": 277
+    "total_sessions": 278
   },
   "fibonacci": {
     "scoring_method": "fibonacci",
@@ -37,7 +37,7 @@
       "v5": 13,
       "v6": 21
     },
-    "total_sessions": 277
+    "total_sessions": 278
   },
   "power_scaling": {
     "scoring_method": "power_scaling",
@@ -51,7 +51,7 @@
       "v5": 14.7,
       "v6": 18.5
     },
-    "total_sessions": 277
+    "total_sessions": 278
   },
   "difficulty_curve": {
     "scoring_method": "difficulty_curve",
@@ -65,6 +65,6 @@
       "v5": 16,
       "v6": 24
     },
-    "total_sessions": 277
+    "total_sessions": 278
   }
 }
