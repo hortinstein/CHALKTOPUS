@@ -10,7 +10,7 @@
     "v5": 20,
     "v6": 32
   },
-  "total_sessions": 282,
+  "total_sessions": 283,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -5630,7 +5630,7 @@
       "v4_tried": 3,
       "v5_completed": 0,
       "v5_tried": 1,
-      "Comments": 0
+      "Comments": "first day soill \ud83d\udc5f "
     },
     {
       "Location": "MOVEMENT, MD",
@@ -5651,6 +5651,26 @@
       "v5_completed": 0,
       "v5_tried": 0,
       "Comments": 0
+    },
+    {
+      "Location": "MOVEMENT, MD",
+      "Dates": "2026-09-18",
+      "daily_score": 15.5,
+      "vb_completed": 1,
+      "vb_tried": 0,
+      "v0_completed": 1,
+      "v0_tried": 0,
+      "v1_completed": 1,
+      "v1_tried": 0,
+      "v2_completed": 1,
+      "v2_tried": 0,
+      "v3_completed": 1,
+      "v3_tried": 2,
+      "v4_completed": 0,
+      "v4_tried": 2,
+      "v5_completed": 0,
+      "v5_tried": 1,
+      "Comments": "almost got the yellow one, v4 good project "
     }
   ]
 }
