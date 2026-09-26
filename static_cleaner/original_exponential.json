@@ -8,7 +8,7 @@
     "v3": 8,
     "v4": 12
   },
-  "total_sessions": 284,
+  "total_sessions": 285,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -5673,6 +5673,26 @@
     {
       "Location": "MOVEMENT, MD",
       "Dates": "2026-09-23",
+      "daily_score": 15.5,
+      "vb_completed": 1,
+      "vb_tried": 0,
+      "v0_completed": 1,
+      "v0_tried": 0,
+      "v1_completed": 1,
+      "v1_tried": 0,
+      "v2_completed": 1,
+      "v2_tried": 0,
+      "v3_completed": 1,
+      "v3_tried": 1,
+      "v4_completed": 0,
+      "v4_tried": 1,
+      "v5_completed": 0,
+      "v5_tried": 0,
+      "Comments": 0
+    },
+    {
+      "Location": "MOVEMENT, MD",
+      "Dates": "2026-09-25",
       "daily_score": 15.5,
       "vb_completed": 1,
       "vb_tried": 0,
