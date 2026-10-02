@@ -10,7 +10,7 @@
     "v5": 13,
     "v6": 21
   },
-  "total_sessions": 287,
+  "total_sessions": 288,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -5748,6 +5748,26 @@
       "v3_tried": 0,
       "v4_completed": 0,
       "v4_tried": 1,
+      "v5_completed": 0,
+      "v5_tried": 0,
+      "Comments": 0
+    },
+    {
+      "Location": "MOVEMENT, VA",
+      "Dates": 0,
+      "daily_score": 14,
+      "vb_completed": 2,
+      "vb_tried": 0,
+      "v0_completed": 2,
+      "v0_tried": 0,
+      "v1_completed": 2,
+      "v1_tried": 0,
+      "v2_completed": 2,
+      "v2_tried": 0,
+      "v3_completed": 0,
+      "v3_tried": 2,
+      "v4_completed": 0,
+      "v4_tried": 0,
       "v5_completed": 0,
       "v5_tried": 0,
       "Comments": 0
