@@ -10,7 +10,7 @@
     "v5": 16,
     "v6": 24
   },
-  "total_sessions": 289,
+  "total_sessions": 290,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -5791,6 +5791,26 @@
       "v5_completed": 0,
       "v5_tried": 0,
       "Comments": 0
+    },
+    {
+      "Location": "MOVEMENT, MD",
+      "Dates": "2026-10-06",
+      "daily_score": 40,
+      "vb_completed": 1,
+      "vb_tried": 0,
+      "v0_completed": 1,
+      "v0_tried": 0,
+      "v1_completed": 1,
+      "v1_tried": 0,
+      "v2_completed": 1,
+      "v2_tried": 0,
+      "v3_completed": 1,
+      "v3_tried": 1,
+      "v4_completed": 2,
+      "v4_tried": 0,
+      "v5_completed": 0,
+      "v5_tried": 1,
+      "Comments": "got a yellow one...like 98% and flashed a v4 pink!"
     }
   ]
 }
