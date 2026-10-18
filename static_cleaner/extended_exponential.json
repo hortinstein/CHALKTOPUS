@@ -10,7 +10,7 @@
     "v5": 20,
     "v6": 32
   },
-  "total_sessions": 293,
+  "total_sessions": 294,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -5867,6 +5867,26 @@
       "v3_completed": 2,
       "v3_tried": 0,
       "v4_completed": 1,
+      "v4_tried": 0,
+      "v5_completed": 0,
+      "v5_tried": 0,
+      "Comments": 0
+    },
+    {
+      "Location": "SPORT ROCK, LORTON, VA",
+      "Dates": "2026-10-17",
+      "daily_score": 33.5,
+      "vb_completed": 1,
+      "vb_tried": 0,
+      "v0_completed": 1,
+      "v0_tried": 0,
+      "v1_completed": 2,
+      "v1_tried": 0,
+      "v2_completed": 3,
+      "v2_tried": 1,
+      "v3_completed": 2,
+      "v3_tried": 0,
+      "v4_completed": 0,
       "v4_tried": 0,
       "v5_completed": 0,
       "v5_tried": 0,
