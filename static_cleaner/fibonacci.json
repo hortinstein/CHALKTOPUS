@@ -10,7 +10,7 @@
     "v5": 13,
     "v6": 21
   },
-  "total_sessions": 297,
+  "total_sessions": 298,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -5951,6 +5951,26 @@
       "v5_completed": 0,
       "v5_tried": 0,
       "Comments": "still arm hurts but feeling a little better"
+    },
+    {
+      "Location": "MOVEMENT, VA",
+      "Dates": "2026-10-31",
+      "daily_score": 19,
+      "vb_completed": 2,
+      "vb_tried": 0,
+      "v0_completed": 2,
+      "v0_tried": 0,
+      "v1_completed": 2,
+      "v1_tried": 0,
+      "v2_completed": 2,
+      "v2_tried": 0,
+      "v3_completed": 1,
+      "v3_tried": 1,
+      "v4_completed": 0,
+      "v4_tried": 0,
+      "v5_completed": 0,
+      "v5_tried": 0,
+      "Comments": "\ud83c\udf83"
     }
   ]
 }
