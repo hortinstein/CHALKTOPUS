@@ -10,7 +10,7 @@
     "v5": 14.7,
     "v6": 18.5
   },
-  "total_sessions": 304,
+  "total_sessions": 305,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -6091,6 +6091,26 @@
       "v5_completed": 0,
       "v5_tried": 0,
       "Comments": 0
+    },
+    {
+      "Location": "MOVEMENT, VA",
+      "Dates": "2026-11-15",
+      "daily_score": 51.2,
+      "vb_completed": 2,
+      "vb_tried": 0,
+      "v0_completed": 2,
+      "v0_tried": 0,
+      "v1_completed": 2,
+      "v1_tried": 0,
+      "v2_completed": 3,
+      "v2_tried": 0,
+      "v3_completed": 2,
+      "v3_tried": 1,
+      "v4_completed": 1,
+      "v4_tried": 0,
+      "v5_completed": 0,
+      "v5_tried": 0,
+      "Comments": "got pretty far on the fun under v3"
     }
   ]
 }
