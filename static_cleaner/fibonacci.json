@@ -10,7 +10,7 @@
     "v5": 13,
     "v6": 21
   },
-  "total_sessions": 305,
+  "total_sessions": 306,
   "sessions": [
     {
       "Location": "CENTRAL ROCK",
@@ -6111,6 +6111,26 @@
       "v5_completed": 0,
       "v5_tried": 0,
       "Comments": "got pretty far on the fun under v3"
+    },
+    {
+      "Location": "MOVEMENT, MD",
+      "Dates": "2026-11-16",
+      "daily_score": 48,
+      "vb_completed": 4,
+      "vb_tried": 0,
+      "v0_completed": 4,
+      "v0_tried": 0,
+      "v1_completed": 4,
+      "v1_tried": 0,
+      "v2_completed": 4,
+      "v2_tried": 0,
+      "v3_completed": 4,
+      "v3_tried": 1,
+      "v4_completed": 0,
+      "v4_tried": 0,
+      "v5_completed": 0,
+      "v5_tried": 0,
+      "Comments": 0
     }
   ]
 }
